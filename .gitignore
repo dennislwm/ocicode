@@ -33,5 +33,5 @@ override.tf.json
 .terraformrc
 terraform.rc
 
-# Secret files
-terraform.tfvars
+# Lock files
+*terraform.lock*

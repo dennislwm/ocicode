@@ -5,8 +5,10 @@ Terraform starter project for Oracle Cloud Infrastructure ["OCI].
 
 - [ocicode](#ocicode)
 - [About ocicode](#about-ocicode)
+  - [TL;DR](#tldr)
   - [Creating SSH Keys](#creating-ssh-keys)
   - [Gathering required information](#gathering-required-information)
+  - [Create scripts for a minimal Terraform project](#create-scripts-for-a-minimal-terraform-project)
 - [Project Structure](#project-structure)
 - [Installation](#installation)
   - [Terraform](#terraform)
@@ -26,9 +28,29 @@ Terraform starter project for Oracle Cloud Infrastructure ["OCI].
 - automate restore files to a cloud server
 - automate backup files from a cloud server
 
+## TL;DR
+
+There is a quicker method to perform both [Creating SSH Keys](#creating-ssh-keys) and [Gathering required information](#gathering-required-information). Login to your [OCI account](https://www.oracle.com/sg/cloud/sign-in.html). 
+
+From your user avatar, go to **User Settings**. Click **Add API Keys**, and select **Generate API Key Pair**.
+
+Download both the generated private `<ssh_key_private>` and public `<ssh_key_private>.pub` keys and save them under your folder `~/.ssh/`.
+
+Click **Add** button and it will automatically gather the required information for you. Copy and paste this into your secret `terraform.tfvars` file.
+
+```json
+tenancy="ocid1.tenancy.oc1.."
+user="ocid1.user.oc1.."
+fingerprint="f9:2b:2a:02.."
+region="us-phoenix-1"
+path_ssh_key_private="~/.ssh/<ssh_key_private>"
+```
+
+Append the prefix `oci_`to the variables above for compatibility with existing Terraform code, e.g. `oci_user`.
+
 ## Creating SSH Keys
 
-Create SSH keys for API signing into your OCI account.
+Skip this if you have already completed [TL;DR](#tldr). Otherwise, create SSH keys for API signing into your OCI account.
 
 ```bash
 mkdir $HOME/.ssh
@@ -45,7 +67,7 @@ click **Add API Keys**, and select **Paste Public Keys**. Paste the content of y
 
 ## Gathering required information
 
-Copy and paste the following information into your secrets Terraform variables file `terraform.tfvars`.
+Skip this if you have already completed [TL;DR](#tldr). Otherwise, copy and paste the following information into your secrets Terraform variables file `terraform.tfvars`.
 
 From the OCI Console and search for `Tenancy Details`. 
 
@@ -77,7 +99,9 @@ oci_region="us-phoenix-1"
 oci_path_ssh_key_private="~/.ssh/id_rsa_oci"
 ```
 
-Your `variables.tf` file.
+## Create scripts for a minimal Terraform project
+
+Before you can use your secret `terraform.tfvars` file, you must create a `variables.tf` file with the following placeholders, one for each variable.
 
 ```json
 variable oci_tenancy {
@@ -97,7 +121,7 @@ variable oci_path_ssh_key_private {
 }
 ```
 
-Creating your `main.tf` and `outputs.tf` files.
+Next create your `main.tf` and `outputs.tf` files for a minimal Terraform project that lists all available domains. This project is found under `tf/001/` folder.
 
 ```json
 provider "oci" {
@@ -119,6 +143,8 @@ output "lst_availability_domains" {
 }
 ```
 
+Create the `versions.tf` file if the provider isn't supported by `hashi`. However, OCI is supported, hence this file is optional.
+
 ---
 # Project Structure
      ocicode/                         <-- Root of your project
@@ -130,7 +156,8 @@ output "lst_availability_domains" {
              |- terraform.tfvars      <-- Secrets Terraform variables file (.gitignore)
              |- variables.tf          <-- TF variables file
              |- versions.tf           <-- TF versions file (required >= 0.13)
-          +- 002/                     <-- Create a compute instance Terraform project
+          +- 002/                     <-- Create a compartment Terraform project
+          +- 003/                     <-- Create a compute instance Terraform project
 
 ---
 # Installation
@@ -144,3 +171,7 @@ Terraform is distributed as a single binary. Install Terraform (64-bit) by unzip
 # References
 
 * [Terraform: Set Up OCI Terraform](https://docs.oracle.com/en-us/iaas/developer-tutorials/tutorials/tf-provider/01-summary.htm)
+
+* [Terraform: Create a Compartment](https://docs.oracle.com/en-us/iaas/developer-tutorials/tutorials/tf-compartment/01-summary.htm)
+
+* [Compute Shapes](https://docs.oracle.com/en-us/iaas/Content/Compute/References/computeshapes.htm)
